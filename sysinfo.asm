@@ -10,15 +10,15 @@
 
 %INCLUDE "libBareMetal.asm"
 
-start:				; Start of program label
+start:					; Start of program label
 
-	mov rsi, startmessage	; Load RSI with memory address of string
-	call [b_output]		; Print the string that RSI points to
-	ret
+	lea rsi, [rel startmessage]	; Load RSI with memory address of string
+	call [b_output]			; Print the string that RSI points to
+	;ret
 
 ;Get processor brand string
 	xor rax, rax
-	mov rdi, tstring
+	lea rdi, [rel tstring]
 	mov eax, 0x80000002
 	cpuid
 	stosd
@@ -48,9 +48,9 @@ start:				; Start of program label
 	stosd
 	xor al, al
 	stosb			; Terminate the string
-	mov rsi, cpustringmsg
+	lea rsi, [rel cpustringmsg]
 	call [b_output]
-	mov rsi, tstring
+	lea rsi, [rel tstring]
 check_for_space:		; Remove the leading spaces from the string
 	cmp byte [rsi], ' '
 	jne print_cpu_string
@@ -60,27 +60,27 @@ print_cpu_string:
 	call [b_output]
 
 ; Number of cores
-	mov rsi, numcoresmsg
+	lea rsi, [rel numcoresmsg]
 	call [b_output]
 	xor rax, rax
 	mov rsi, 0x5012
 	lodsw
-	mov rdi, tstring
+	lea rdi, [rel tstring]
 	call int_to_string
-	mov rsi, tstring
+	lea rsi, [rel tstring]
 	call [b_output]
 
 ; Speed 
-	mov rsi, speedmsg
+	lea rsi, [rel speedmsg]
 	call [b_output]
 	xor rax, rax
 	mov rsi, 0x5010
 	lodsw
-	mov rdi, tstring
+	lea rdi, [rel tstring]
 	call int_to_string
-	mov rsi, tstring
+	lea rsi, [rel tstring]
 	call [b_output]
-	mov rsi, mhzmsg
+	lea rsi, [rel mhzmsg]
 	call [b_output]
 
 ; L1 code/data cache info
@@ -88,23 +88,23 @@ print_cpu_string:
 	cpuid
 	mov eax, edx		; EDX bits 31 - 24 store code L1 cache size in KBs
 	shr eax, 24
-	mov rdi, tstring
+	lea rdi, [rel tstring]
 	call int_to_string
-	mov rsi, l1ccachemsg
+	lea rsi, [rel l1ccachemsg]
 	call [b_output]
-	mov rsi, tstring
+	lea rsi, [rel tstring]
 	call [b_output]
-	mov rsi, kbmsg
+	lea rsi, [rel kbmsg]
 	call [b_output]
 	mov eax, ecx		; ECX bits 31 - 24 store data L1 cache size in KBs
 	shr eax, 24
-	mov rdi, tstring
+	lea rdi, [rel tstring]
 	call int_to_string
-	mov rsi, l1dcachemsg
+	lea rsi, [rel l1dcachemsg]
 	call [b_output]
-	mov rsi, tstring
+	lea rsi, [rel tstring]
 	call [b_output]
-	mov rsi, kbmsg
+	lea rsi, [rel kbmsg]
 	call [b_output]
 
 ; L2/L3 cache info
@@ -112,30 +112,30 @@ print_cpu_string:
 	cpuid
 	mov eax, ecx		; ecx bits 31 - 16 store unified L2 cache size in KBs
 	shr eax, 16
-	mov rdi, tstring
+	lea rdi, [rel tstring]
 	call int_to_string
-	mov rsi, l2ucachemsg
+	lea rsi, [rel l2ucachemsg]
 	call [b_output]
-	mov rsi, tstring
+	lea rsi, [rel tstring]
 	call [b_output]
-	mov rsi, kbmsg
+	lea rsi, [rel kbmsg]
 	call [b_output]
 
 	mov eax, edx		; edx bits 31 - 18 store unified L3 cache size in 512 KB chunks
 	shr eax, 18
 	and eax, 0x3FFFF	; Clear bits 18 - 31
 	shl eax, 9		; Convert the value for 512 KB chunks to KBs (Multiply by 512)
-	mov rdi, tstring
+	lea rdi, [rel tstring]
 	call int_to_string
-	mov rsi, l3ucachemsg
+	lea rsi, [rel l3ucachemsg]
 	call [b_output]
-	mov rsi, tstring
+	lea rsi, [rel tstring]
 	call [b_output]
-	mov rsi, kbmsg
+	lea rsi, [rel kbmsg]
 	call [b_output]
 
 ;CPU features
-	mov rsi, cpufeatures
+	lea rsi, [rel cpufeatures]
 	call [b_output]
 	mov rax, 1
 	cpuid
@@ -143,71 +143,71 @@ print_cpu_string:
 checksse:
 	test edx, 00000010000000000000000000000000b
 	jz checksse2
-	mov rsi, sse
+	lea rsi, [rel sse]
 	call [b_output]
 
 checksse2:
 	test edx, 00000100000000000000000000000000b
 	jz checksse3
-	mov rsi, sse2
+	lea rsi, [rel sse2]
 	call [b_output]
 
 checksse3:
 	test ecx, 00000000000000000000000000000001b
 	jz checkssse3
-	mov rsi, sse3
+	lea rsi, [rel sse3]
 	call [b_output]
 
 checkssse3:
 	test ecx, 00000000000000000000001000000000b
 	jz checksse41
-	mov rsi, ssse3
+	lea rsi, [rel ssse3]
 	call [b_output]
 
 checksse41:
 	test ecx, 00000000000010000000000000000000b
 	jz checksse42
-	mov rsi, sse41
+	lea rsi, [rel sse41]
 	call [b_output]
 
 checksse42:
 	test ecx, 00000000000100000000000000000000b
 	jz checkaes
-	mov rsi, sse42
+	lea rsi, [rel sse42]
 	call [b_output]
 
 checkaes:
 	test ecx, 00000010000000000000000000000000b
 	jz checkavx
-	mov rsi, aes
+	lea rsi, [rel aes]
 	call [b_output]
 
 checkavx:
 	test ecx, 00010000000000000000000000000000b
 	jz endit
-	mov rsi, avx
+	lea rsi, [rel avx]
 	call [b_output]
 
 endit:
 
 ;RAM
-	mov rsi, memmessage
+	lea rsi, [rel memmessage]
 	call [b_output]
 	xor rax, rax
 	mov rsi, 0x5020
 	lodsw
-	mov rdi, tstring
+	lea rdi, [rel tstring]
 	call int_to_string
-	mov rsi, tstring
+	lea rsi, [rel tstring]
 	call [b_output]
-	mov rsi, mbmsg
+	lea rsi, [rel mbmsg]
 	call [b_output]
 
 ;Disk
 ;	To be added
 
 ;Fin
-	mov rsi, newline
+	lea rsi, [rel newline]
 	call [b_output]
 
 ret				; Return to OS
