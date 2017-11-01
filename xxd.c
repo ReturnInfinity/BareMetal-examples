@@ -75,7 +75,7 @@ static int xxd(const char *filename)
 		for (size_t i = 0; i < read_count; i++) {
 			char c = buffer[i];
 			/* check if character is printable */
-			if (((c < 32) && (c != '\t')) || (c > 127))
+			if (((c < 32) && (c != '\t')) || (c >= 127))
 				fwrite(".", 1, 1, stdout);
 			else
 				fwrite(&c, 1, 1, stdout);
