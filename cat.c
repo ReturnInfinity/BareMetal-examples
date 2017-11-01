@@ -7,6 +7,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+static int cat(const char *filename);
+
+#if 0
+int main(int argc, const char **argv)
+{
+	for (int i = 1; i < argc; i++) {
+		cat(argv[i]);
+	}
+	return EXIT_SUCCESS;
+}
+#else
+int main(void)
+{
+	cat("readme.md");
+	return EXIT_SUCCESS;
+}
+#endif
+
 static int cat(const char *filename)
 {
 	FILE *file = fopen(filename, "rb");
@@ -17,7 +35,6 @@ static int cat(const char *filename)
 	while (!feof(file))
 	{
 		size_t read_count = fread(buffer, 1, sizeof(buffer), file);
-		
 		fwrite(buffer, 1, read_count, stdout);
 	}
 
@@ -26,10 +43,3 @@ static int cat(const char *filename)
 	return EXIT_SUCCESS;
 }
 
-int main(int argc, char **argv)
-{
-	for (int i = 1; i < argc; i++) {
-		cat(argv[i]);
-	}
-	return EXIT_SUCCESS;
-}
