@@ -9,7 +9,6 @@
 
 static int cat(const char *filename);
 
-#if 0
 int main(int argc, const char **argv)
 {
 	for (int i = 1; i < argc; i++) {
@@ -17,13 +16,6 @@ int main(int argc, const char **argv)
 	}
 	return EXIT_SUCCESS;
 }
-#else
-int main(void)
-{
-	cat("readme.md");
-	return EXIT_SUCCESS;
-}
-#endif
 
 static int cat(const char *filename)
 {
