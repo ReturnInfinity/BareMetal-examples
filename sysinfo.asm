@@ -6,11 +6,12 @@
 
 
 [BITS 64]
-[ORG 0x0000000000200000]
 
 %INCLUDE "libBareMetal.asm"
 
-start:					; Start of program label
+global main
+
+main:					; Start of program label
 
 	lea rsi, [rel startmessage]	; Load RSI with memory address of string
 	call [b_output]			; Print the string that RSI points to
