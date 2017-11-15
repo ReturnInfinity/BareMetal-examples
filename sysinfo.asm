@@ -285,7 +285,7 @@ int_to_string_next_digit:
 
 
 startmessage: db 'System Information:' ; String falls through to newline
-newline: db 13, 0
+newline: db 10, 0
 cpustringmsg: db 'CPU String: ', 0
 numcoresmsg: db 13, 'Number of cores: ', 0
 speedmsg: db 13, 'Detected speed: ', 0
