@@ -287,13 +287,13 @@ int_to_string_next_digit:
 startmessage: db 'System Information:' ; String falls through to newline
 newline: db 10, 0
 cpustringmsg: db 'CPU String: ', 0
-numcoresmsg: db 13, 'Number of cores: ', 0
-speedmsg: db 13, 'Detected speed: ', 0
-l1ccachemsg: db 13, 'L1 code cache: ', 0
-l1dcachemsg: db 13, 'L1 data cache: ', 0
-l2ucachemsg: db 13, 'L2 unified cache: ', 0
-l3ucachemsg: db 13, 'L3 unified cache: ', 0
-cpufeatures: db 13, 'CPU features: ', 0
+numcoresmsg: db 10, 'Number of cores: ', 0
+speedmsg: db 10, 'Detected speed: ', 0
+l1ccachemsg: db 10, 'L1 code cache: ', 0
+l1dcachemsg: db 10, 'L1 data cache: ', 0
+l2ucachemsg: db 10, 'L2 unified cache: ', 0
+l3ucachemsg: db 10, 'L3 unified cache: ', 0
+cpufeatures: db 10, 'CPU features: ', 0
 kbmsg: db ' KiB', 0
 mbmsg: db ' MiB', 0
 mhzmsg: db ' MHz', 0
@@ -305,6 +305,6 @@ sse41: db 'SSE4.1 ', 0
 sse42: db 'SSE4.2 ', 0
 aes: db 'AES ', 0
 avx: db 'AVX ', 0
-memmessage: db 13, 'RAM: ', 0
+memmessage: db 10, 'RAM: ', 0
 
 tstring: times 50 db 0
