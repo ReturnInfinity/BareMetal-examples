@@ -118,12 +118,12 @@ int iterate_pci(void *fdata, int (*f)(void *fdata, const struct pci_entry *entry
 	{
 		for (uint8_t slot = 0; slot < 255; slot++)
 		{
-			entry.vendor = pciConfigReadWord(bus, slot, 0, 0);
+			entry.vendor = b_pci_read_config(bus, slot, 0, 0);
 			if (entry.vendor == 0xffff)
 				continue;
 			entry.bus = bus;
 			entry.slot = slot;
-			entry.device = pciConfigReadWord(bus, slot, 0, 2);
+			entry.device = b_pci_read_config(bus, slot, 0, 2);
 			int err = f(fdata, &entry);
 			if (err != 0)
 				return err;
@@ -131,16 +131,5 @@ int iterate_pci(void *fdata, int (*f)(void *fdata, const struct pci_entry *entry
 	}
 
 	return 0;
-}
-
- uint16_t pciCheckVendor(uint8_t bus, uint8_t slot)
-{
-	uint16_t vendor, device;
-	if ((vendor = b_pci_read_config(bus, slot, 0, 0)) != 0xffff) {
-		// found a device
-		device = b_pci_read_config(bus, slot, 0, 2);
-		(void) device;
-	}
-	return vendor;
 }
 
