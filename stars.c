@@ -26,8 +26,7 @@ int main(void)
 
 void putpixel(int x, int y, char red, char green, char blue)
 {
-	/* TODO - Why does x_res not work here? */
-	int offset = ((y * 1024) + x) * (depth / 8);
+	int offset = ((y * x_res) + x) * (depth / 8);
 	frame_buffer[offset+0] = blue;
 	frame_buffer[offset+1] = green;
 	frame_buffer[offset+2] = red;
