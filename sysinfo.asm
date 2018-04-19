@@ -4,16 +4,11 @@
 ; BareMetal compile:
 ; nasm sysinfo.asm -o sysinfo.app
 
-
-[BITS 64]
-
-%INCLUDE "libBareMetal.asm"
-
-global main
+%include "libBareMetal.asm"
 
 main:					; Start of program label
 
-	lea rsi, [rel startmessage]	; Load RSI with memory address of string
+	lea rdi, [rel startmessage]	; Load RSI with memory address of string
 	call output			; Print the string that RSI points to
 
 ;Get processor brand string
@@ -48,39 +43,39 @@ main:					; Start of program label
 	stosd
 	xor al, al
 	stosb			; Terminate the string
-	lea rsi, [rel cpustringmsg]
+	lea rdi, [rel cpustringmsg]
 	call output
-	lea rsi, [rel tstring]
+	lea rdi, [rel tstring]
 check_for_space:		; Remove the leading spaces from the string
-	cmp byte [rsi], ' '
+	cmp byte [rdi], ' '
 	jne print_cpu_string
-	add rsi, 1
+	add rdi, 1
 	jmp check_for_space
 print_cpu_string:
 	call output
 
 ; Number of cores
-	lea rsi, [rel numcoresmsg]
+	lea rdi, [rel numcoresmsg]
 	call output
 	xor rax, rax
 	mov rsi, 0x5012
 	lodsw
 	lea rdi, [rel tstring]
 	call int_to_string
-	lea rsi, [rel tstring]
+	lea rdi, [rel tstring]
 	call output
 
 ; Speed 
-	lea rsi, [rel speedmsg]
+	lea rdi, [rel speedmsg]
 	call output
 	xor rax, rax
 	mov rsi, 0x5010
 	lodsw
 	lea rdi, [rel tstring]
 	call int_to_string
-	lea rsi, [rel tstring]
+	lea rdi, [rel tstring]
 	call output
-	lea rsi, [rel mhzmsg]
+	lea rdi, [rel mhzmsg]
 	call output
 
 ; L1 code/data cache info
@@ -90,21 +85,21 @@ print_cpu_string:
 	shr eax, 24
 	lea rdi, [rel tstring]
 	call int_to_string
-	lea rsi, [rel l1ccachemsg]
+	lea rdi, [rel l1ccachemsg]
 	call output
-	lea rsi, [rel tstring]
+	lea rdi, [rel tstring]
 	call output
-	lea rsi, [rel kbmsg]
+	lea rdi, [rel kbmsg]
 	call output
 	mov eax, ecx		; ECX bits 31 - 24 store data L1 cache size in KBs
 	shr eax, 24
 	lea rdi, [rel tstring]
 	call int_to_string
-	lea rsi, [rel l1dcachemsg]
+	lea rdi, [rel l1dcachemsg]
 	call output
-	lea rsi, [rel tstring]
+	lea rdi, [rel tstring]
 	call output
-	lea rsi, [rel kbmsg]
+	lea rdi, [rel kbmsg]
 	call output
 
 ; L2/L3 cache info
@@ -114,11 +109,11 @@ print_cpu_string:
 	shr eax, 16
 	lea rdi, [rel tstring]
 	call int_to_string
-	lea rsi, [rel l2ucachemsg]
+	lea rdi, [rel l2ucachemsg]
 	call output
-	lea rsi, [rel tstring]
+	lea rdi, [rel tstring]
 	call output
-	lea rsi, [rel kbmsg]
+	lea rdi, [rel kbmsg]
 	call output
 
 	mov eax, edx		; edx bits 31 - 18 store unified L3 cache size in 512 KB chunks
@@ -127,15 +122,15 @@ print_cpu_string:
 	shl eax, 9		; Convert the value for 512 KB chunks to KBs (Multiply by 512)
 	lea rdi, [rel tstring]
 	call int_to_string
-	lea rsi, [rel l3ucachemsg]
+	lea rdi, [rel l3ucachemsg]
 	call output
-	lea rsi, [rel tstring]
+	lea rdi, [rel tstring]
 	call output
-	lea rsi, [rel kbmsg]
+	lea rdi, [rel kbmsg]
 	call output
 
 ;CPU features
-	lea rsi, [rel cpufeatures]
+	lea rdi, [rel cpufeatures]
 	call output
 	mov rax, 1
 	cpuid
@@ -143,104 +138,74 @@ print_cpu_string:
 checksse:
 	test edx, 00000010000000000000000000000000b
 	jz checksse2
-	lea rsi, [rel sse]
+	lea rdi, [rel sse]
 	call output
 
 checksse2:
 	test edx, 00000100000000000000000000000000b
 	jz checksse3
-	lea rsi, [rel sse2]
+	lea rdi, [rel sse2]
 	call output
 
 checksse3:
 	test ecx, 00000000000000000000000000000001b
 	jz checkssse3
-	lea rsi, [rel sse3]
+	lea rdi, [rel sse3]
 	call output
 
 checkssse3:
 	test ecx, 00000000000000000000001000000000b
 	jz checksse41
-	lea rsi, [rel ssse3]
+	lea rdi, [rel ssse3]
 	call output
 
 checksse41:
 	test ecx, 00000000000010000000000000000000b
 	jz checksse42
-	lea rsi, [rel sse41]
+	lea rdi, [rel sse41]
 	call output
 
 checksse42:
 	test ecx, 00000000000100000000000000000000b
 	jz checkaes
-	lea rsi, [rel sse42]
+	lea rdi, [rel sse42]
 	call output
 
 checkaes:
 	test ecx, 00000010000000000000000000000000b
 	jz checkavx
-	lea rsi, [rel aes]
+	lea rdi, [rel aes]
 	call output
 
 checkavx:
 	test ecx, 00010000000000000000000000000000b
 	jz endit
-	lea rsi, [rel avx]
+	lea rdi, [rel avx]
 	call output
 
 endit:
 
 ;RAM
-	lea rsi, [rel memmessage]
+	lea rdi, [rel memmessage]
 	call output
 	xor rax, rax
 	mov rsi, 0x5020
 	lodsw
 	lea rdi, [rel tstring]
 	call int_to_string
-	lea rsi, [rel tstring]
+	lea rdi, [rel tstring]
 	call output
-	lea rsi, [rel mbmsg]
+	lea rdi, [rel mbmsg]
 	call output
 
 ;Disk
 ;	To be added
 
 ;Fin
-	lea rsi, [rel newline]
+	lea rdi, [rel newline]
 	call output
 
 ret				; Return to OS
-
-
-; -----------------------------------------------------------------------------
-; output -- Outputs a string
-;  IN:	RSI = message location (zero-terminated string)
-; OUT:	All registers preserved
-output:
-	push rdi
-	push rcx
-	push rax
-	pushf
-
-	xor ecx, ecx			; 0 terminator for scasb
-	xor eax, eax
-	mov rdi, rsi
-	not rcx
-	cld
-	repne scasb			; compare byte at RDI to value in AL
-	not rcx
-	dec rcx
-
-	call [b_output]
-
-	popf
-	pop rax
-	pop rcx
-	pop rdi
-	ret
-; -----------------------------------------------------------------------------
- 
 
 ; -----------------------------------------------------------------------------
 ; int_to_string -- Convert a binary interger into an string
