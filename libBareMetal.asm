@@ -35,56 +35,70 @@ _start:
 	; passed by Alloy.
 	cmp rdi, 0
 	je .fail
-	; Assign the app data
+	; Preserve registers
+	push rdi
+	push rsi
+	push rdx
+	; Assign the app host
 	mov rsi, [rdi]
-	mov qword [app_host], rsi
+	mov [rel app_host], rsi
 	add rdi, 8
 	; Assign the argument count
-	mov qword [argc], rdi
+	mov esi, [rdi]
+	mov dword [rel argc], esi
 	add rdi, 8
 	; Assign the arguments pointer
-	mov qword [argv], rdi
+	mov rsi, [rdi]
+	mov qword [rel argv], rsi
 	add rdi, 8
 	; Assign the environment variables
-	mov qword [env], rdi
+	mov rsi, [rdi]
+	mov qword [rel env], rsi
 	add rdi, 8
 	; Assign write callback
 	mov rsi, [rdi]
-	mov qword [write_callback], rsi
+	mov qword [rel write_callback], rsi
 	add rdi, 8
 	; Assign the read callback
 	mov rsi, [rdi]
-	mov qword [read_callback], rsi
+	mov qword [rel read_callback], rsi
 	add rdi, 8
 	; Assign the open callback
 	mov rsi, [rdi]
-	mov qword [open_callback], rsi
+	mov qword [rel open_callback], rsi
 	add rdi, 8
 	; Assign the close callback
 	mov rsi, [rdi]
-	mov qword [close_callback], rsi
+	mov qword [rel close_callback], rsi
 	add rdi, 8
 	; Assign the malloc callback
 	mov rsi, [rdi]
-	mov qword [malloc_callback], rsi
+	mov qword [rel malloc_callback], rsi
 	add rdi, 8
 	; Assign the realloc callback
 	mov rsi, [rdi]
-	mov qword [realloc_callback], rsi
+	mov qword [rel realloc_callback], rsi
 	add rdi, 8
 	; Assign the free callback
 	mov rsi, [rdi]
-	mov qword [free_callback], rsi
+	mov qword [rel free_callback], rsi
 	add rdi, 8
 	; Set the parameters for 'main'
-	mov rdi, argc
+	xor rdi, rdi
+	mov edi, argc
 	mov rsi, argv
 	mov rdx, env
 	; Call the main entry point.
 	call main
-	; Return to Alloy.
+	; Return to Alloy
+	pop rdx
+	pop rsi
+	pop rdi
 	ret
 .fail:
+	pop rdx
+	pop rsi
+	pop rdi
 	mov rax, 1
 	ret
 
@@ -92,7 +106,7 @@ _start:
 ; This does not include the null-terminating pointer
 ; in the argument array.
 argc:
-	dq 0
+	dw 0
 
 ; A pointer to the null-terminated argument strings.
 ; The last string pointer is set to zero.
@@ -120,14 +134,14 @@ app_host:
 ;   RAX - The number of bytes written on success, a negative one on failure.
 write:
 	; Ensure write pointer isn't NULL
-	cmp qword [write_callback], 0
+	cmp qword [rel write_callback], 0
 	je .fail
 	; Ensure the app data pointer isn't NULL
-	cmp qword [app_host], 0
+	cmp qword [rel app_host], 0
 	je .fail
 	; Assign the 'app_host' argument.
-	mov rcx, [app_host]
-	call [write_callback]
+	mov rcx, [rel app_host]
+	call [rel write_callback]
 	ret
 .fail:
 	mov rax, -1
@@ -163,14 +177,14 @@ output:
 ;   RAX - The number of bytes read from the file.
 read:
 	; Ensure read pointer isn't NULL
-	cmp qword [read_callback], 0
+	cmp qword [rel read_callback], 0
 	je .fail
 	; Ensure that the app host pointer isn't NULL
-	cmp qword [app_host], 0
+	cmp qword [rel app_host], 0
 	je .fail
 	; Assign the 'app_host' argument and call the function.
-	mov rcx, [app_host]
-	call [read_callback]
+	mov rcx, [rel app_host]
+	call [rel read_callback]
 	ret
 .fail:
 	mov rax, -1
@@ -184,14 +198,14 @@ read:
 ;   RAX - The address of the memory region on success, zero on failure.
 malloc:
 	; Ensure that the 'malloc' pointer isn't NULL
-	cmp qword [malloc_callback], 0
+	cmp qword [rel malloc_callback], 0
 	je .fail
 	; Ensure that the 'app_host' pointer isn't NULL
-	cmp qword [app_host], 0
+	cmp qword [rel app_host], 0
 	je .fail
 	; Call the function
-	mov rsi, [app_host]
-	call [malloc_callback]
+	mov rsi, [rel app_host]
+	call [rel malloc_callback]
 	ret
 .fail:
 	xor rax, rax
@@ -208,14 +222,14 @@ malloc:
 ;   RAX - The address of the new memory region.
 realloc:
 	; Ensure that the 'realloc' pointer isn't NULL
-	cmp qword [realloc_callback], 0
+	cmp qword [rel realloc_callback], 0
 	je .fail
 	; Ensure that the 'app_host' pointer isn't NULL
-	cmp qword [app_host], 0
+	cmp qword [rel app_host], 0
 	je .fail
 	; Call the function
-	mov rdx, [app_host]
-	call [realloc_callback]
+	mov rdx, [rel app_host]
+	call [rel realloc_callback]
 	ret
 .fail:
 	xor rax, rax
@@ -229,14 +243,14 @@ realloc:
 ;   RDI - The address of the memory to free.
 free:
 	; Ensure that the 'realloc' pointer isn't NULL
-	cmp qword [realloc_callback], 0
+	cmp qword [rel realloc_callback], 0
 	je .fail
 	; Ensure that the 'app_host' pointer isn't NULL
-	cmp qword [app_host], 0
+	cmp qword [rel app_host], 0
 	je .fail
 	; Call the function
-	mov rsi, [app_host]
-	call [realloc_callback]
+	mov rsi, [rel app_host]
+	call [rel realloc_callback]
 	ret
 .fail:
 	ret
