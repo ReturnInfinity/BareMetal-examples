@@ -1,6 +1,5 @@
-OUTPUT_FORMAT("binary")
 OUTPUT_ARCH("i386:x86-64")
-ENTRY(main)
+ENTRY(_start)
 SECTIONS
 {
 	. = 0xFFFF800000000000;

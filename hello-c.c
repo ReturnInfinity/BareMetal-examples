@@ -4,12 +4,12 @@
  * Compile: 'gcc hello-c.c -o hello-c'
  * */
 
-#include <stdio.h>
-#include <stdlib.h>
+#include "libBareMetal.h"
 
 int main(void)
 {
-	puts("Hello, world!\n");
+	output("Hello, world!\n");
+	output("This is a C program.\n");
 	return EXIT_SUCCESS;
 }
 
